@@ -1,0 +1,46 @@
+
+@model IEnumerable<CrumbCount2.Models.Disposition>
+
+@{
+    ViewData["Title"] = "Disposition Management";
+}
+
+<h1>Disposition Management</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Add Disposition</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Waste Recording ID</th>
+            <th>Disposition Type</th>
+            <th>Quantity</th>
+            <th>Disposition Date</th>
+            <th>Remarks</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.WasteRecordingId</td>
+                <td>@item.DispositionType</td>
+                <td>@item.Quantity</td>
+                <td>@item.DispositionDate.ToString("yyyy-MM-dd")</td>
+                <td>@item.Remarks</td>
+                <td>
+                    <a asp-action="Edit"
+                       asp-route-id="@item.DispositionId"
+                       class="btn btn-warning btn-sm">Edit</a>
+
+                    <a asp-action="Delete"
+                       asp-route-id="@item.DispositionId"
+                       class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

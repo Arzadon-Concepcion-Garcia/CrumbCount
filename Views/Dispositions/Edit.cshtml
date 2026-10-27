@@ -1,0 +1,60 @@
+
+@model CrumbCount2.Models.Disposition
+
+@{
+    ViewData["Title"] = "Edit Disposition";
+}
+
+<h1>Edit Disposition</h1>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="DispositionId" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="form-group mb-3">
+        <label asp-for="WasteRecordingId"></label>
+        <select asp-for="WasteRecordingId"
+                asp-items="ViewBag.WasteRecordingId"
+                class="form-control">
+            <option value="">-- Select Waste Recording --</option>
+        </select>
+        <span asp-validation-for="WasteRecordingId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="DispositionType"></label>
+        <select asp-for="DispositionType" class="form-control">
+            <option value="Staff Consumption">Staff Consumption</option>
+            <option value="Donation">Donation</option>
+            <option value="Approved Reuse">Approved Reuse</option>
+            <option value="Disposal">Disposal</option>
+        </select>
+        <span asp-validation-for="DispositionType" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Quantity"></label>
+        <input asp-for="Quantity" class="form-control" />
+        <span asp-validation-for="Quantity" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="DispositionDate"></label>
+        <input asp-for="DispositionDate" type="date" class="form-control" />
+        <span asp-validation-for="DispositionDate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Remarks"></label>
+        <textarea asp-for="Remarks" class="form-control"></textarea>
+        <span asp-validation-for="Remarks" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

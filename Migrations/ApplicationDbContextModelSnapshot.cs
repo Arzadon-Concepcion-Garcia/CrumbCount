@@ -36,6 +36,37 @@ namespace CrumbCount2.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("CrumbCount2.Models.Disposition", b =>
+                {
+                    b.Property<int>("DispositionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("DispositionDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DispositionType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Remarks")
+                        .HasMaxLength(250)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("WasteRecordingId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("DispositionId");
+
+                    b.HasIndex("WasteRecordingId");
+
+                    b.ToTable("Dispositions");
+                });
+
             modelBuilder.Entity("CrumbCount2.Models.Product", b =>
                 {
                     b.Property<int>("ProductId")
@@ -92,6 +123,17 @@ namespace CrumbCount2.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("WasteRecordings");
+                });
+
+            modelBuilder.Entity("CrumbCount2.Models.Disposition", b =>
+                {
+                    b.HasOne("CrumbCount2.Models.WasteRecording", "WasteRecording")
+                        .WithMany()
+                        .HasForeignKey("WasteRecordingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WasteRecording");
                 });
 
             modelBuilder.Entity("CrumbCount2.Models.Product", b =>

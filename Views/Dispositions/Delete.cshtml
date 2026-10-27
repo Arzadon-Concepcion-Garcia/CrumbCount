@@ -1,0 +1,35 @@
+
+@model CrumbCount2.Models.Disposition
+
+@{
+    ViewData["Title"] = "Delete Disposition";
+}
+
+<h1>Delete Disposition</h1>
+
+<h4>Are you sure you want to delete this disposition?</h4>
+
+<div class="card p-3 mb-3">
+    <dl class="row">
+        <dt class="col-sm-3">Waste Recording ID</dt>
+        <dd class="col-sm-9">@Model.WasteRecordingId</dd>
+
+        <dt class="col-sm-3">Disposition Type</dt>
+        <dd class="col-sm-9">@Model.DispositionType</dd>
+
+        <dt class="col-sm-3">Quantity</dt>
+        <dd class="col-sm-9">@Model.Quantity</dd>
+
+        <dt class="col-sm-3">Disposition Date</dt>
+        <dd class="col-sm-9">@Model.DispositionDate.ToString("yyyy-MM-dd")</dd>
+
+        <dt class="col-sm-3">Remarks</dt>
+        <dd class="col-sm-9">@Model.Remarks</dd>
+    </dl>
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="DispositionId" />
+    <button type="submit" class="btn btn-danger">Confirm Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
