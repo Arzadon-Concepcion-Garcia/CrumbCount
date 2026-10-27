@@ -1,22 +1,26 @@
+
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CrumbCount2.Models;
-
-public class Product
+namespace CrumbCount2.Models
 {
-    public int ProductId { get; set; }
+    public class Product
+    {
+        [Key]
+        public int ProductId { get; set; }
 
-    [Required]
-    public int CategoryId { get; set; }
+        public int CategoryId { get; set; }
 
-    [Required]
-    [StringLength(100)]
-    public string ProductName { get; set; } = "";
+        [ForeignKey("CategoryId")]
+        public Category? Category { get; set; }
 
-    [Range(0, double.MaxValue)]
-    public decimal UnitCost { get; set; }
+        [Required]
+        [StringLength(100)]
+        public string ProductName { get; set; } = "";
 
-    public bool IsActive { get; set; } = true;
+        [Range(0, double.MaxValue)]
+        public decimal UnitCost { get; set; }
 
-    public Category? Category { get; set; }
+        public bool IsActive { get; set; } = true;
+    }
 }
