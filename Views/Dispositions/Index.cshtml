@@ -1,0 +1,45 @@
+
+@model IEnumerable<CrumbCount2.Models.Disposition>
+
+@{
+    ViewData["Title"] = "Disposition Management";
+}
+
+<h2>Disposition Management</h2>
+
+<p>Manage the disposition of wasted bakery products.</p>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">
+        Add New Disposition
+    </a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Disposition Type</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Remarks</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.DispositionId</td>
+                <td>@item.WasteRecording?.Product?.ProductName</td>
+                <td>@item.Quantity</td>
+                <td>@item.DispositionType</td>
+                <td>@item.DispositionDate.ToString("MM/dd/yyyy")</td>
+                <td>@item.Status</td>
+                <td>@item.Remarks</td>
+            </tr>
+        }
+    </tbody>
+</table>

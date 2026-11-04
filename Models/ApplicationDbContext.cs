@@ -14,5 +14,6 @@ public class ApplicationDbContext : DbContext
     public DbSet<Category> Categories { get; set; } = default!;
     public DbSet<Product> Products { get; set; } = default!;
     public DbSet<WasteRecording> WasteRecordings { get; set; } = default!;
+    public DbSet<Disposition> Dispositions { get; set; } = default!;
 }
 
