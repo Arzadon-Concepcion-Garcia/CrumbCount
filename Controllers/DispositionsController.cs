@@ -63,4 +63,113 @@ public class DispositionsController : Controller
 
         return View(disposition);
     }
+
+    // Display the Details page
+    public async Task<IActionResult> Details(int? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+
+        var disposition = await _context.Dispositions
+            .Include(d => d.WasteRecording)
+            .ThenInclude(w => w!.Product)
+            .FirstOrDefaultAsync(d => d.DispositionId == id);
+
+        if (disposition == null)
+        {
+            return NotFound();
+        }
+
+        return View(disposition);
+    }
+
+    // Display the Edit page
+    public async Task<IActionResult> Edit(int? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+
+        var disposition = await _context.Dispositions.FindAsync(id);
+
+        if (disposition == null)
+        {
+            return NotFound();
+        }
+
+        ViewData["WasteRecordingId"] = new SelectList(
+            _context.WasteRecordings,
+            "WasteRecordingId",
+            "WasteRecordingId",
+            disposition.WasteRecordingId);
+
+        return View(disposition);
+    }
+
+    // Save the edited disposition
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, Disposition disposition)
+    {
+        if (id != disposition.DispositionId)
+        {
+            return NotFound();
+        }
+
+        if (ModelState.IsValid)
+        {
+            _context.Update(disposition);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        ViewData["WasteRecordingId"] = new SelectList(
+            _context.WasteRecordings,
+            "WasteRecordingId",
+            "WasteRecordingId",
+            disposition.WasteRecordingId);
+
+        return View(disposition);
+    }
+
+    // Display the Delete confirmation page
+    public async Task<IActionResult> Delete(int? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+
+        var disposition = await _context.Dispositions
+            .Include(d => d.WasteRecording)
+            .ThenInclude(w => w!.Product)
+            .FirstOrDefaultAsync(d => d.DispositionId == id);
+
+        if (disposition == null)
+        {
+            return NotFound();
+        }
+
+        return View(disposition);
+    }
+
+    // Delete the disposition
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        var disposition = await _context.Dispositions.FindAsync(id);
+
+        if (disposition != null)
+        {
+            _context.Dispositions.Remove(disposition);
+            await _context.SaveChangesAsync();
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
 }

@@ -1,0 +1,62 @@
+
+@model CrumbCount2.Models.Disposition
+
+@{
+    ViewData["Title"] = "Edit Disposition";
+}
+
+<h2>Edit Disposition</h2>
+
+<form asp-action="Edit" method="post">
+
+    <input type="hidden" asp-for="DispositionId" />
+
+    <div class="mb-3">
+        <label asp-for="WasteRecordingId" class="form-label"></label>
+        <select asp-for="WasteRecordingId"
+                class="form-select"
+                asp-items="ViewBag.WasteRecordingId">
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DispositionType" class="form-label"></label>
+        <select asp-for="DispositionType" class="form-select">
+            <option value="Donation">Donation</option>
+            <option value="Disposal">Disposal</option>
+            <option value="Staff Consumption">Staff Consumption</option>
+            <option value="Approved Reuse">Approved Reuse</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Quantity" class="form-label"></label>
+        <input asp-for="Quantity" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DispositionDate" class="form-label"></label>
+        <input asp-for="DispositionDate" type="date"
+               class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Status" class="form-label"></label>
+        <select asp-for="Status" class="form-select">
+            <option value="Pending">Pending</option>
+            <option value="Completed">Completed</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Remarks" class="form-label"></label>
+        <textarea asp-for="Remarks" class="form-control"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Save Changes
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+
+</form>
