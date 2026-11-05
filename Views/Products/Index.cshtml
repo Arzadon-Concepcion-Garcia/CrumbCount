@@ -1,53 +1,69 @@
+
 @model IEnumerable<CrumbCount2.Models.Product>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Products";
 }
 
-<h1>Index</h1>
+<h1>Products</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
 </p>
+
+<input type="text" id="searchBox" class="form-control mb-3"
+       placeholder="Live search products..." />
+
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ProductName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UnitCost)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsActive)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Category)
-            </th>
+            <th>Product Name</th>
+            <th>Unit Cost</th>
+            <th>Active</th>
+            <th>Category</th>
             <th></th>
         </tr>
     </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UnitCost)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsActive)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Category.CategoryName)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ProductId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ProductId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ProductId">Delete</a>
-            </td>
-        </tr>
-}
+    <tbody id="productRows">
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.ProductName</td>
+                <td>@item.UnitCost</td>
+                <td>@item.IsActive</td>
+                <td>@item.Category?.CategoryName</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ProductId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.ProductId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.ProductId">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+@section Scripts {
+    <script>
+        // Runs every time something is typed in the search box
+        document.getElementById("searchBox").addEventListener("input", function () {
+
+            // Get the text entered by the user
+            const text = this.value.toLowerCase();
+
+            // Check every row in the Products table
+            document.querySelectorAll("#productRows tr").forEach(function (row) {
+
+                // Get the product information from the first four columns
+                const rowText = (
+                    row.cells[0].textContent + " " +
+                    row.cells[1].textContent + " " +
+                    row.cells[2].textContent + " " +
+                    row.cells[3].textContent
+                ).toLowerCase();
+
+                // Show matching rows and hide non-matching rows
+                row.style.display = rowText.includes(text) ? "" : "none";
+            });
+        });
+    </script>
+}
