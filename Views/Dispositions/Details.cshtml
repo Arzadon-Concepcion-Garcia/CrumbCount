@@ -1,0 +1,32 @@
+@model CrumbCount2.Models.Disposition
+
+@{
+    ViewData["Title"] = "Disposition Details";
+}
+
+<h1>Disposition Details</h1>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">Waste Recording</dt>
+        <dd class="col-sm-9">@Model.WasteRecording?.Product?.ProductName</dd>
+
+        <dt class="col-sm-3">Disposition Type</dt>
+        <dd class="col-sm-9">@Model.DispositionType</dd>
+
+        <dt class="col-sm-3">Quantity</dt>
+        <dd class="col-sm-9">@Model.Quantity</dd>
+
+        <dt class="col-sm-3">Disposition Date</dt>
+        <dd class="col-sm-9">@Model.DispositionDate.ToShortDateString()</dd>
+
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">@Model.Status</dd>
+
+        <dt class="col-sm-3">Remarks</dt>
+        <dd class="col-sm-9">@Model.Remarks</dd>
+    </dl>
+</div>
+
+<a asp-action="Edit" asp-route-id="@Model.DispositionId" class="btn btn-primary">Edit</a>
+<a asp-action="Index" class="btn btn-secondary">Back to List</a>
