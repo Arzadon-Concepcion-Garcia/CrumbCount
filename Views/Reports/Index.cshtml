@@ -1,0 +1,98 @@
+
+@model CrumbCount2.Models.ViewModels.WasteReportViewModel
+
+@{
+    ViewData["Title"] = "Waste Reports";
+}
+
+<h1>Waste Reports</h1>
+<p>Summary of recorded bakery waste and estimated costs.</p>
+
+<hr />
+
+<h3>Overall Summary</h3>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Total Waste Records</th>
+        <td>@Model.TotalWasteRecords</td>
+    </tr>
+    <tr>
+        <th>Total Quantity Wasted</th>
+        <td>@Model.TotalQuantityWasted</td>
+    </tr>
+    <tr>
+        <th>Total Estimated Waste Cost</th>
+        <td>@Model.TotalWasteCost.ToString("C2")</td>
+    </tr>
+</table>
+
+<hr />
+
+<h3>Waste by Product</h3>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Product Name</th>
+            <th>Quantity Wasted</th>
+            <th>Estimated Waste Cost</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.ProductSummaries)
+        {
+            <tr>
+                <td>@item.ProductName</td>
+                <td>@item.QuantityWasted</td>
+                <td>@item.WasteCost.ToString("C2")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<hr />
+
+<h3>Waste by Category</h3>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Category</th>
+            <th>Estimated Waste Cost</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.CategorySummaries)
+        {
+            <tr>
+                <td>@item.CategoryName</td>
+                <td>@item.WasteCost.ToString("C2")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<hr />
+
+<h3>Waste by Reason</h3>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Reason</th>
+            <th>Quantity Wasted</th>
+            <th>Estimated Waste Cost</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.ReasonSummaries)
+        {
+            <tr>
+                <td>@item.Reason</td>
+                <td>@item.QuantityWasted</td>
+                <td>@item.WasteCost.ToString("C2")</td>
+            </tr>
+        }
+    </tbody>
+</table>
