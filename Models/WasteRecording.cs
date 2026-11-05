@@ -1,34 +1,43 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CrumbCount2.Models;
-
-public class WasteRecording
+namespace CrumbCount2.Models
 {
-    public int WasteRecordingId { get; set; }
+    public class WasteRecording
+    {
+        public int WasteRecordingId { get; set; }
 
-    [Required]
-    [Display(Name = "Product")]
-    public int ProductId { get; set; }
+        [Required]
+        [Display(Name = "Product")]
+        public int ProductId { get; set; }
 
-    [Required]
-    [Range(1, 100000)]
-    [Display(Name = "Quantity Wasted")]
-    public int QuantityWasted { get; set; }
+        [Required]
+        [Range(1, 100000)]
+        [Display(Name = "Quantity Wasted")]
+        public int QuantityWasted { get; set; }
 
-    [Required]
-    [DataType(DataType.Date)]
-    [Display(Name = "Date Recorded")]
-    public DateTime DateRecorded { get; set; } = DateTime.Today;
+        [Required]
+        [DataType(DataType.Date)]
+        [Display(Name = "Date Recorded")]
+        public DateTime DateRecorded { get; set; } = DateTime.Today;
 
-    [Required]
-    [StringLength(100)]
-    [Display(Name = "Reason for Waste")]
-    public string ReasonForWaste { get; set; } = "";
+        [Required]
+        [StringLength(100)]
+        [Display(Name = "Reason for Waste")]
+        public string ReasonForWaste { get; set; } = "";
 
-    [StringLength(250)]
-    public string? Remarks { get; set; }
+        [StringLength(250)]
+        public string? Remarks { get; set; }
 
-    public Product? Product { get; set; }
+        [ForeignKey("ProductId")]
+        public Product? Product { get; set; }
+
+        [NotMapped]
+        [Display(Name = "Estimated Waste Cost")]
+        public decimal EstimatedWasteCost =>
+            QuantityWasted * (Product?.UnitCost ?? 0);
+    }
 }
+
