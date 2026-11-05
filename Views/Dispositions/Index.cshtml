@@ -15,7 +15,16 @@
     </a>
 </p>
 
-<table class="table table-bordered table-striped">
+<div class="mb-3">
+    <input type="text" id="searchInput" class="form-control"
+           placeholder="Search by product, disposition type, or status..." />
+
+    <button type="button" id="clearSearch" class="btn btn-secondary mt-2">
+        Clear Search
+    </button>
+</div>
+
+<table class="table table-bordered table-striped" id="dispositionTable">
     <thead>
         <tr>
             <th>ID</th>
@@ -42,11 +51,59 @@
                 <td>@item.Remarks</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.DispositionId"
-                    class="btn btn-warning btn-sm">Edit</a> <a asp-action="Delete"
-                    asp-route-id="@item.DispositionId"
-                    class="btn btn-danger btn-sm">Delete</a> <a asp-action="Details" asp-route-id="@item.DispositionId">Details</a> |
+                       class="btn btn-warning btn-sm">Edit</a>
+
+                    <a asp-action="Delete" asp-route-id="@item.DispositionId"
+                       class="btn btn-danger btn-sm">Delete</a>
+
+                    <a asp-action="Details" asp-route-id="@item.DispositionId"
+                       class="btn btn-info btn-sm">Details</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<p id="noResults" style="display:none;" class="text-danger">
+    No matching dispositions found.
+</p>
+
+@section Scripts {
+    <script>
+        document.getElementById("searchInput").addEventListener("keyup", function () {
+            var searchValue = this.value.toLowerCase();
+            var rows = document.querySelectorAll("#dispositionTable tbody tr");
+            var visibleCount = 0;
+
+            rows.forEach(function (row) {
+                var product = row.cells[1].textContent.toLowerCase();
+                var type = row.cells[3].textContent.toLowerCase();
+                var status = row.cells[5].textContent.toLowerCase();
+
+                if (product.includes(searchValue) ||
+                    type.includes(searchValue) ||
+                    status.includes(searchValue)) {
+                    row.style.display = "";
+                    visibleCount++;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            document.getElementById("noResults").style.display =
+                visibleCount === 0 ? "block" : "none";
+        });
+
+        document.getElementById("clearSearch").addEventListener("click", function () {
+        document.getElementById("searchInput").value = "";
+
+        var rows = document.querySelectorAll("#dispositionTable tbody tr");
+
+        rows.forEach(function (row) {
+            row.style.display = "";
+        });
+
+        document.getElementById("noResults").style.display = "none";
+    });
+    </script>
+}
