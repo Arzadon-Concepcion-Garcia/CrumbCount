@@ -1,45 +1,92 @@
+
 @model CrumbCount2.Models.WasteRecording
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Waste Record";
 }
 
-<h1>Edit</h1>
+<h1>Edit Waste Record</h1>
 
-<h4>WasteRecording</h4>
+<h4>Waste Recording Information</h4>
 <hr />
+
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <form asp-action="Edit" method="post">
+
+            <div asp-validation-summary="ModelOnly"
+                class="text-danger"></div>
+
             <input type="hidden" asp-for="WasteRecordingId" />
-            <div class="form-group">
-                <label asp-for="ProductId" class="control-label"></label>
-                <select asp-for="ProductId" class="form-control" asp-items="ViewBag.ProductId"></select>
-                <span asp-validation-for="ProductId" class="text-danger"></span>
+
+            <div class="form-group mb-3">
+                <label asp-for="ProductId"
+                       class="control-label"></label>
+
+                <select asp-for="ProductId"
+                        class="form-control"
+                        asp-items="ViewBag.ProductId">
+                    <option value="0">-- Select a Product --</option>
+                </select>
+
+                <span asp-validation-for="ProductId"
+                      class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="QuantityWasted" class="control-label"></label>
-                <input asp-for="QuantityWasted" class="form-control" />
-                <span asp-validation-for="QuantityWasted" class="text-danger"></span>
+
+            <div class="form-group mb-3">
+                <label asp-for="QuantityWasted"
+                       class="control-label"></label>
+
+                <input asp-for="QuantityWasted"
+                       class="form-control"
+                       min="1"
+                       max="100000" />
+
+                <span asp-validation-for="QuantityWasted"
+                      class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="DateRecorded" class="control-label"></label>
-                <input asp-for="DateRecorded" class="form-control" />
-                <span asp-validation-for="DateRecorded" class="text-danger"></span>
+
+            <div class="form-group mb-3">
+                <label asp-for="DateRecorded"
+                       class="control-label"></label>
+
+                <input asp-for="DateRecorded"
+                       class="form-control"
+                       type="date"
+                       max="@DateTime.Today.ToString("yyyy-MM-dd")" />
+
+                <span asp-validation-for="DateRecorded"
+                      class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="ReasonForWaste" class="control-label"></label>
-                <input asp-for="ReasonForWaste" class="form-control" />
-                <span asp-validation-for="ReasonForWaste" class="text-danger"></span>
+
+            <div class="form-group mb-3">
+                <label asp-for="ReasonForWaste"
+                       class="control-label"></label>
+
+                <input asp-for="ReasonForWaste"
+                       class="form-control"
+                       maxlength="100" />
+
+                <span asp-validation-for="ReasonForWaste"
+                      class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Remarks" class="control-label"></label>
-                <input asp-for="Remarks" class="form-control" />
-                <span asp-validation-for="Remarks" class="text-danger"></span>
+
+            <div class="form-group mb-3">
+                <label asp-for="Remarks"
+                       class="control-label"></label>
+
+                <input asp-for="Remarks"
+                       class="form-control"
+                       maxlength="250" />
+
+                <span asp-validation-for="Remarks"
+                      class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+
+            <div class="form-group mb-3">
+                <input type="submit"
+                       value="Save"
+                       class="btn btn-primary" />
             </div>
         </form>
     </div>
@@ -49,3 +96,8 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
