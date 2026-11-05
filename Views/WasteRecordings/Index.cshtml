@@ -8,56 +8,140 @@
 <h1>Waste Records</h1>
 
 <p>
-    <a asp-action="Create" class="btn btn-primary">Add Waste Record</a>
+    <a asp-action="Create" class="btn btn-primary">
+        Add Waste Record
+    </a>
 </p>
 
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>Quantity Wasted</th>
-            <th>Date Recorded</th>
-            <th>Reason for Waste</th>
-            <th>Remarks</th>
-            <th>Product</th>
-            <th>Unit Cost</th>
-            <th>Estimated Waste Cost</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
+<!-- LIVE SEARCH BOX -->
+<div class="mb-3">
+    <label for="searchInput" class="form-label">
+        Search Waste Records
+    </label>
 
-    <tbody>
-        @foreach (var item in Model)
-        {
+    <input type="text"
+           id="searchInput"
+           class="form-control"
+           placeholder="Search by product, reason, or remarks..."
+           autocomplete="off"
+           aria-controls="wasteRecordsTable" />
+</div>
+
+<!-- WASTE RECORDS TABLE -->
+<div class="table-responsive">
+    <table id="wasteRecordsTable"
+           class="table table-bordered table-striped">
+
+        <thead>
             <tr>
-                <td>@item.QuantityWasted</td>
-
-                <td>@item.DateRecorded.ToString("MM/dd/yyyy")</td>
-
-                <td>@item.ReasonForWaste</td>
-
-                <td>@item.Remarks</td>
-
-                <td>@(item.Product?.ProductName ?? "Unknown Product")</td>
-
-                <td>
-                    @(item.Product?.UnitCost.ToString("C2") ?? "N/A")
-                </td>
-
-                <td>
-                    @item.EstimatedWasteCost.ToString("C2")
-                </td>
-
-                <td>
-                    <a asp-action="Edit"
-                       asp-route-id="@item.WasteRecordingId">Edit</a> |
-
-                    <a asp-action="Details"
-                       asp-route-id="@item.WasteRecordingId">Details</a> |
-
-                    <a asp-action="Delete"
-                       asp-route-id="@item.WasteRecordingId">Delete</a>
-                </td>
+                <th>Quantity Wasted</th>
+                <th>Date Recorded</th>
+                <th>Reason for Waste</th>
+                <th>Remarks</th>
+                <th>Product</th>
+                <th>Unit Cost</th>
+                <th>Estimated Waste Cost</th>
+                <th>Actions</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+
+        <tbody id="wasteRecordsBody">
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.QuantityWasted</td>
+
+                    <td>
+                        @item.DateRecorded.ToString("MM/dd/yyyy")
+                    </td>
+
+                    <td>@item.ReasonForWaste</td>
+
+                    <td>@item.Remarks</td>
+
+                    <td>
+                        @(item.Product?.ProductName ?? "Unknown Product")
+                    </td>
+
+                    <td>
+                        @(item.Product?.UnitCost.ToString("C2") ?? "N/A")
+                    </td>
+
+                    <td>
+                        @item.EstimatedWasteCost.ToString("C2")
+                    </td>
+
+                    <td>
+                        <a asp-action="Edit"
+                           asp-route-id="@item.WasteRecordingId">Edit</a> |
+
+                        <a asp-action="Details"
+                           asp-route-id="@item.WasteRecordingId">Details</a> |
+
+                        <a asp-action="Delete"
+                           asp-route-id="@item.WasteRecordingId">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- SEARCH RESULT MESSAGE -->
+<p id="noResultsMessage"
+   class="text-muted"
+   role="status"
+   aria-live="polite"
+   style="display: none;">
+    No matching waste records found.
+</p>
+
+<!-- LIVE SEARCH SCRIPT -->
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const searchInput =
+                document.getElementById("searchInput");
+
+            const tableBody =
+                document.getElementById("wasteRecordsBody");
+
+            const rows =
+                tableBody.querySelectorAll("tr");
+
+            const noResultsMessage =
+                document.getElementById("noResultsMessage");
+
+            searchInput.addEventListener("input", function () {
+
+                const searchText =
+                    searchInput.value.trim().toLowerCase();
+
+                let visibleCount = 0;
+
+                rows.forEach(function (row) {
+
+                    // Search Product, Reason and Remarks.
+                    const reason = row.cells[2].textContent.toLowerCase();
+                    const remarks = row.cells[3].textContent.toLowerCase();
+                    const product = row.cells[4].textContent.toLowerCase();
+
+                    const matches =
+                        product.includes(searchText) ||
+                        reason.includes(searchText) ||
+                        remarks.includes(searchText);
+
+                    row.style.display = matches ? "" : "none";
+
+                    if (matches) {
+                        visibleCount++;
+                    }
+                });
+
+                noResultsMessage.style.display =
+                    visibleCount === 0 ? "block" : "none";
+            });
+        });
+    </script>
+}
