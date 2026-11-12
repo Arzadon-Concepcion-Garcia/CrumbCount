@@ -1,0 +1,36 @@
+
+@model List<CrumbCount2.Models.Holiday>
+
+@{
+    ViewData["Title"] = "Philippine Holidays";
+    var today = DateOnly.FromDateTime(DateTime.Now);
+}
+
+<h1>Philippine Holidays @ViewBag.Year</h1>
+<p class="text-muted">
+    This data comes from an outside website:
+    <a href="https://date.nager.at" target="_blank">date.nager.at</a>
+</p>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+<table class="table table-bordered">
+    <thead>
+        <tr><th>Date</th><th>Day</th><th>Filipino Name</th><th>English Name</th></tr>
+    </thead>
+    <tbody>
+        @foreach (var h in Model)
+        {
+            @* Holidays that already passed are shown faded *@
+            <tr class="@(h.Date < today ? "opacity-50" : "")">
+                <td>@h.Date.ToString("MMMM d")</td>
+                <td>@h.Date.DayOfWeek</td>
+                <td>@h.LocalName</td>
+                <td>@h.Name</td>
+            </tr>
+        }
+    </tbody>
+</table>
