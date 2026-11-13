@@ -96,3 +96,48 @@
         }
     </tbody>
 </table>
+
+<hr />
+
+
+<h3>AI-Powered Waste Insights</h3>
+
+<div class="card">
+    <div class="card-header">
+        <strong>Gemini AI Analysis</strong>
+    </div>
+
+    <div class="card-body">
+        <p>
+            AI-generated observations and recommendations
+            based on the recorded bakery waste data.
+        </p>
+
+        <form asp-controller="Reports"
+              asp-action="GenerateInsights"
+              method="post">
+
+            <button type="submit" class="btn btn-primary">
+                Generate AI Insights
+            </button>
+        </form>
+
+        <hr />
+
+        @if (!string.IsNullOrWhiteSpace(Model.AiInsights))
+        {
+            <div style="white-space: pre-line;">
+                @Model.AiInsights
+            </div>
+        }
+        else
+        {
+            <p class="text-muted">
+                Click the button above to generate AI-powered
+                observations and recommendations.
+            </p>
+        }
+    </div>
+</div>
+
+

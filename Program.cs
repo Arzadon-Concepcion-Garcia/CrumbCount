@@ -1,4 +1,4 @@
-
+using CrumbCount2.Services;
 using CrumbCount2.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +9,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(
         builder.Configuration.GetConnectionString("DefaultConnection")));
+    builder.Services.AddScoped<GeminiService>();
 
 var app = builder.Build();
 

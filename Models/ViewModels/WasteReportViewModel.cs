@@ -11,6 +11,8 @@ namespace CrumbCount2.Models.ViewModels
 
         public decimal TotalWasteCost { get; set; }
 
+        public string AiInsights { get; set; } = "";
+
         public List<ProductWasteSummary> ProductSummaries { get; set; }
             = new List<ProductWasteSummary>();
 
