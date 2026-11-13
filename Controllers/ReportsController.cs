@@ -3,19 +3,65 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CrumbCount2.Models;
 using CrumbCount2.Models.ViewModels;
+using CrumbCount2.Services;
+using System.Text;
 
 namespace CrumbCount2.Controllers
 {
     public class ReportsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly GeminiService _geminiService;
 
-        public ReportsController(ApplicationDbContext context)
+        public ReportsController(
+            ApplicationDbContext context,
+            GeminiService geminiService)
         {
             _context = context;
+            _geminiService = geminiService;
         }
 
         public async Task<IActionResult> Index()
+        {
+            var report = await GetWasteReport();
+
+            return View(report);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GenerateInsights()
+        {
+            var report = await GetWasteReport();
+
+            if (report.TotalWasteRecords == 0)
+            {
+                report.AiInsights =
+                    "No waste records are available for AI analysis.";
+
+                return View("Index", report);
+            }
+
+            try
+            {
+                string reportData = CreateReportData(report);
+
+                report.AiInsights = await _geminiService
+                    .GenerateWasteInsights(reportData);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("GEMINI ERROR:");
+                Console.WriteLine(ex.ToString());
+
+                report.AiInsights =
+                    "AI insights are currently unavailable. Please try again later.";
+            }
+
+            return View("Index", report);
+        }
+
+        private async Task<WasteReportViewModel> GetWasteReport()
         {
             var wasteRecords = await _context.WasteRecordings
                 .Include(w => w.Product)
@@ -64,7 +110,49 @@ namespace CrumbCount2.Controllers
                 })
                 .ToList();
 
-            return View(report);
+            return report;
         }
+
+
+private string CreateReportData(WasteReportViewModel report)
+{
+    StringBuilder reportData = new StringBuilder();
+
+    reportData.AppendLine("Overall Summary:");
+    reportData.AppendLine(
+        $"Total Waste Records: {report.TotalWasteRecords}");
+    reportData.AppendLine(
+        $"Total Quantity Wasted: {report.TotalQuantityWasted}");
+    reportData.AppendLine(
+        $"Total Waste Cost: ₱{report.TotalWasteCost:N2}");
+
+    reportData.AppendLine("\nWaste by Product:");
+
+    foreach (var item in report.ProductSummaries)
+    {
+        reportData.AppendLine(
+            $"{item.ProductName}: Quantity Wasted = {item.QuantityWasted}, Waste Cost = ₱{item.WasteCost:N2}");
+    }
+
+    reportData.AppendLine("\nWaste by Category:");
+
+    foreach (var item in report.CategorySummaries)
+    {
+        reportData.AppendLine(
+            $"{item.CategoryName}: Waste Cost = ₱{item.WasteCost:N2}");
+    }
+
+    reportData.AppendLine("\nWaste by Reason:");
+
+    foreach (var item in report.ReasonSummaries)
+    {
+        reportData.AppendLine(
+            $"{item.Reason}: Quantity Wasted = {item.QuantityWasted}, Waste Cost = ₱{item.WasteCost:N2}");
+    }
+
+    return reportData.ToString();
+}
+
     }
 }
+
