@@ -23,7 +23,7 @@
     </tr>
     <tr>
         <th>Total Estimated Waste Cost</th>
-        <td>@Model.TotalWasteCost.ToString("C2")</td>
+        <td>₱@Model.TotalWasteCost.ToString("N2"))</td>
     </tr>
 </table>
 
@@ -45,7 +45,7 @@
             <tr>
                 <td>@item.ProductName</td>
                 <td>@item.QuantityWasted</td>
-                <td>@item.WasteCost.ToString("C2")</td>
+                <td>₱@item.WasteCost.ToString("N2")</td>
             </tr>
         }
     </tbody>
@@ -67,7 +67,7 @@
         {
             <tr>
                 <td>@item.CategoryName</td>
-                <td>@item.WasteCost.ToString("C2")</td>
+                <td>₱@item.WasteCost.ToString("N2")</td>
             </tr>
         }
     </tbody>
@@ -91,7 +91,7 @@
             <tr>
                 <td>@item.Reason</td>
                 <td>@item.QuantityWasted</td>
-                <td>@item.WasteCost.ToString("C2")</td>
+                <td>₱@item.WasteCost.ToString("N2")</td>
             </tr>
         }
     </tbody>

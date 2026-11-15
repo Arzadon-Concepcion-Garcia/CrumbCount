@@ -64,11 +64,11 @@
                     </td>
 
                     <td>
-                        @(item.Product?.UnitCost.ToString("C2") ?? "N/A")
+                        @(item.Product == null ? "N/A" : $"₱{item.Product.UnitCost:N2}")
                     </td>
 
                     <td>
-                        @item.EstimatedWasteCost.ToString("C2")
+                        ₱@item.EstimatedWasteCost.ToString("N2")
                     </td>
 
                     <td>
