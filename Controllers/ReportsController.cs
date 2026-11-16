@@ -12,13 +12,16 @@ namespace CrumbCount2.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly GeminiService _geminiService;
+        private readonly IHolidayService _holidayService;
 
         public ReportsController(
             ApplicationDbContext context,
-            GeminiService geminiService)
+            GeminiService geminiService,
+            IHolidayService holidayService)
         {
             _context = context;
             _geminiService = geminiService;
+            _holidayService = holidayService;
         }
 
         public async Task<IActionResult> Index()
@@ -46,8 +49,37 @@ namespace CrumbCount2.Controllers
             {
                 string reportData = CreateReportData(report);
 
+                string holidayData;
+
+                try
+                {
+                    var holidays = await _holidayService
+                        .GetHolidaysAsync(DateTime.Now.Year);
+
+                    StringBuilder holidayBuilder = new StringBuilder();
+
+                    holidayBuilder.AppendLine(
+                        "Philippine Public Holidays:");
+
+                    foreach (var holiday in holidays)
+                    {
+                        holidayBuilder.AppendLine(
+                            $"{holiday.Date:yyyy-MM-dd} - {holiday.LocalName} ({holiday.Name})");
+                    }
+
+                    holidayData = holidayBuilder.ToString();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("HOLIDAY API ERROR:");
+                    Console.WriteLine(ex.ToString());
+
+                    holidayData =
+                        "Holiday information is unavailable. Do not assume holiday dates.";
+                }
+
                 report.AiInsights = await _geminiService
-                    .GenerateWasteInsights(reportData);
+                    .GenerateWasteInsights(reportData, holidayData);
             }
             catch (Exception ex)
             {
@@ -69,6 +101,9 @@ namespace CrumbCount2.Controllers
                 .ToListAsync();
 
             var report = new WasteReportViewModel();
+
+            // Store individual waste records, including their dates
+            report.WasteRecords = wasteRecords;
 
             report.TotalWasteRecords = wasteRecords.Count;
 
@@ -113,46 +148,57 @@ namespace CrumbCount2.Controllers
             return report;
         }
 
+        private string CreateReportData(WasteReportViewModel report)
+        {
+            StringBuilder reportData = new StringBuilder();
 
-private string CreateReportData(WasteReportViewModel report)
-{
-    StringBuilder reportData = new StringBuilder();
+            reportData.AppendLine("OVERALL SUMMARY:");
+            reportData.AppendLine(
+                $"Total Waste Records: {report.TotalWasteRecords}");
+            reportData.AppendLine(
+                $"Total Quantity Wasted: {report.TotalQuantityWasted}");
+            reportData.AppendLine(
+                $"Total Waste Cost: ₱{report.TotalWasteCost:N2}");
 
-    reportData.AppendLine("Overall Summary:");
-    reportData.AppendLine(
-        $"Total Waste Records: {report.TotalWasteRecords}");
-    reportData.AppendLine(
-        $"Total Quantity Wasted: {report.TotalQuantityWasted}");
-    reportData.AppendLine(
-        $"Total Waste Cost: ₱{report.TotalWasteCost:N2}");
+            reportData.AppendLine("\nINDIVIDUAL WASTE RECORDS:");
 
-    reportData.AppendLine("\nWaste by Product:");
+            foreach (var waste in report.WasteRecords)
+            {
+                reportData.AppendLine(
+                    $"Date: {waste.DateRecorded:yyyy-MM-dd} | " +
+                    $"Product: {waste.Product?.ProductName ?? "Unknown Product"} | " +
+                    $"Quantity: {waste.QuantityWasted} | " +
+                    $"Reason: {waste.ReasonForWaste} | " +
+                    $"Estimated Cost: ₱{waste.EstimatedWasteCost:N2}");
+            }
 
-    foreach (var item in report.ProductSummaries)
-    {
-        reportData.AppendLine(
-            $"{item.ProductName}: Quantity Wasted = {item.QuantityWasted}, Waste Cost = ₱{item.WasteCost:N2}");
+            reportData.AppendLine("\nWASTE BY PRODUCT:");
+
+            foreach (var item in report.ProductSummaries)
+            {
+                reportData.AppendLine(
+                    $"{item.ProductName}: Quantity Wasted = {item.QuantityWasted}, " +
+                    $"Waste Cost = ₱{item.WasteCost:N2}");
+            }
+
+            reportData.AppendLine("\nWASTE BY CATEGORY:");
+
+            foreach (var item in report.CategorySummaries)
+            {
+                reportData.AppendLine(
+                    $"{item.CategoryName}: Waste Cost = ₱{item.WasteCost:N2}");
+            }
+
+            reportData.AppendLine("\nWASTE BY REASON:");
+
+            foreach (var item in report.ReasonSummaries)
+            {
+                reportData.AppendLine(
+                    $"{item.Reason}: Quantity Wasted = {item.QuantityWasted}, " +
+                    $"Waste Cost = ₱{item.WasteCost:N2}");
+            }
+
+            return reportData.ToString();
+        }
     }
-
-    reportData.AppendLine("\nWaste by Category:");
-
-    foreach (var item in report.CategorySummaries)
-    {
-        reportData.AppendLine(
-            $"{item.CategoryName}: Waste Cost = ₱{item.WasteCost:N2}");
-    }
-
-    reportData.AppendLine("\nWaste by Reason:");
-
-    foreach (var item in report.ReasonSummaries)
-    {
-        reportData.AppendLine(
-            $"{item.Reason}: Quantity Wasted = {item.QuantityWasted}, Waste Cost = ₱{item.WasteCost:N2}");
-    }
-
-    return reportData.ToString();
 }
-
-    }
-}
-
