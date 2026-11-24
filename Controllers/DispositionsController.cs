@@ -1,7 +1,7 @@
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using CrumbCount2.Models;
 
 namespace CrumbCount2.Controllers;
@@ -16,6 +16,7 @@ public class DispositionsController : Controller
     }
 
     // Display all dispositions
+    [Authorize(Roles = "Administrator,Staff")]
     public async Task<IActionResult> Index()
     {
         var dispositions = _context.Dispositions
@@ -26,6 +27,7 @@ public class DispositionsController : Controller
     }
 
     // Display the create page
+    [Authorize(Roles = "Administrator,Staff")]
     public IActionResult Create()
     {
         ViewData["WasteRecordingId"] = new SelectList(
@@ -43,6 +45,7 @@ public class DispositionsController : Controller
     }
 
     // Save a new disposition
+    [Authorize(Roles = "Administrator,Staff")]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Disposition disposition)
@@ -65,6 +68,7 @@ public class DispositionsController : Controller
     }
 
     // Display the Details page
+    [Authorize(Roles = "Administrator,Staff")]
     public async Task<IActionResult> Details(int? id)
     {
         if (id == null)
@@ -86,6 +90,7 @@ public class DispositionsController : Controller
     }
 
     // Display the Edit page
+    [Authorize(Roles = "Administrator,Staff")]
     public async Task<IActionResult> Edit(int? id)
     {
         if (id == null)
@@ -110,6 +115,7 @@ public class DispositionsController : Controller
     }
 
     // Save the edited disposition
+    [Authorize(Roles = "Administrator,Staff")]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, Disposition disposition)
@@ -137,6 +143,7 @@ public class DispositionsController : Controller
     }
 
     // Display the Delete confirmation page
+    [Authorize(Roles = "Administrator,Staff")]
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null)
@@ -158,6 +165,7 @@ public class DispositionsController : Controller
     }
 
     // Delete the disposition
+    [Authorize(Roles = "Administrator,Staff")]
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)

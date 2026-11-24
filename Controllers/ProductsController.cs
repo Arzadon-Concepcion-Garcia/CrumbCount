@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using CrumbCount2.Models;
 
 namespace CrumbCount2.Controllers
@@ -19,6 +20,8 @@ namespace CrumbCount2.Controllers
         }
 
         // GET: Products
+        // Administrator and Staff can view products
+        [Authorize(Roles = "Administrator,Staff")]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Products.Include(p => p.Category);
@@ -26,6 +29,8 @@ namespace CrumbCount2.Controllers
         }
 
         // GET: Products/Details/5
+        // Administrator and Staff can view product details
+        [Authorize(Roles = "Administrator,Staff")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -36,6 +41,7 @@ namespace CrumbCount2.Controllers
             var product = await _context.Products
                 .Include(p => p.Category)
                 .FirstOrDefaultAsync(m => m.ProductId == id);
+
             if (product == null)
             {
                 return NotFound();
@@ -45,6 +51,8 @@ namespace CrumbCount2.Controllers
         }
 
         // GET: Products/Create
+        // Only Administrator can create products
+        [Authorize(Roles = "Administrator")]
         public IActionResult Create()
         {
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName");
@@ -52,8 +60,7 @@ namespace CrumbCount2.Controllers
         }
 
         // POST: Products/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ProductId,CategoryId,ProductName,UnitCost,IsActive")] Product product)
@@ -64,11 +71,14 @@ namespace CrumbCount2.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", product.CategoryId);
             return View(product);
         }
 
         // GET: Products/Edit/5
+        // Only Administrator can edit products
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -77,17 +87,18 @@ namespace CrumbCount2.Controllers
             }
 
             var product = await _context.Products.FindAsync(id);
+
             if (product == null)
             {
                 return NotFound();
             }
+
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", product.CategoryId);
             return View(product);
         }
 
         // POST: Products/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ProductId,CategoryId,ProductName,UnitCost,IsActive")] Product product)
@@ -115,13 +126,17 @@ namespace CrumbCount2.Controllers
                         throw;
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", product.CategoryId);
             return View(product);
         }
 
         // GET: Products/Delete/5
+        // Only Administrator can delete products
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -132,6 +147,7 @@ namespace CrumbCount2.Controllers
             var product = await _context.Products
                 .Include(p => p.Category)
                 .FirstOrDefaultAsync(m => m.ProductId == id);
+
             if (product == null)
             {
                 return NotFound();
@@ -141,11 +157,13 @@ namespace CrumbCount2.Controllers
         }
 
         // POST: Products/Delete/5
+        [Authorize(Roles = "Administrator")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var product = await _context.Products.FindAsync(id);
+
             if (product != null)
             {
                 _context.Products.Remove(product);

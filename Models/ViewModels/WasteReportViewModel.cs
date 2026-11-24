@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections.Generic;
 using CrumbCount2.Models;
 
@@ -13,6 +14,14 @@ namespace CrumbCount2.Models.ViewModels
         public decimal TotalWasteCost { get; set; }
 
         public string AiInsights { get; set; } = "";
+
+        // Selected date filter
+        public string SelectedPeriod { get; set; } = "Today";
+
+        // Date range used by the report
+        public DateTime StartDate { get; set; }
+
+        public DateTime EndDate { get; set; }
 
         // Stores individual waste records, including their dates
         public List<WasteRecording> WasteRecords { get; set; }

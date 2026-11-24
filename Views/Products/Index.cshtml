@@ -7,9 +7,12 @@
 
 <h1>Products</h1>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Create New</a>
-</p>
+@if (User.IsInRole("Administrator"))
+{
+    <p>
+        <a asp-action="Create" class="btn btn-primary">Create New</a>
+    </p>
+}
 
 <input type="text" id="searchBox" class="form-control mb-3"
        placeholder="Live search products..." />
@@ -33,9 +36,19 @@
                 <td>@item.IsActive</td>
                 <td>@item.Category?.CategoryName</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.ProductId">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.ProductId">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.ProductId">Delete</a>
+                    @if (User.IsInRole("Administrator"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.ProductId">Edit</a>
+                        <span> | </span>
+                    }
+
+                    <a asp-action="Details" asp-route-id="@item.ProductId">Details</a>
+
+                    @if (User.IsInRole("Administrator"))
+                    {
+                        <span> | </span>
+                        <a asp-action="Delete" asp-route-id="@item.ProductId">Delete</a>
+                    }
                 </td>
             </tr>
         }
@@ -44,16 +57,12 @@
 
 @section Scripts {
     <script>
-        // Runs every time something is typed in the search box
         document.getElementById("searchBox").addEventListener("input", function () {
 
-            // Get the text entered by the user
             const text = this.value.toLowerCase();
 
-            // Check every row in the Products table
             document.querySelectorAll("#productRows tr").forEach(function (row) {
 
-                // Get the product information from the first four columns
                 const rowText = (
                     row.cells[0].textContent + " " +
                     row.cells[1].textContent + " " +
@@ -61,9 +70,9 @@
                     row.cells[3].textContent
                 ).toLowerCase();
 
-                // Show matching rows and hide non-matching rows
                 row.style.display = rowText.includes(text) ? "" : "none";
             });
         });
     </script>
 }
+

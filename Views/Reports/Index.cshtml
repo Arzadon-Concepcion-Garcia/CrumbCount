@@ -10,6 +10,31 @@
 
 <hr />
 
+<h3>Report Date Filter</h3>
+
+<form asp-controller="Reports" asp-action="Index" method="get" class="mb-3">
+    <div class="row align-items-end">
+        <div class="col-md-4">
+            <label for="period" class="form-label">Select Report Period</label>
+            <select id="period" name="period" class="form-select"
+                    onchange="this.form.submit()">
+                <option value="Today" selected="@(Model.SelectedPeriod == "Today")">Today</option>
+                <option value="Weekly" selected="@(Model.SelectedPeriod == "Weekly")">Weekly</option>
+                <option value="Monthly" selected="@(Model.SelectedPeriod == "Monthly")">Monthly</option>
+            </select>
+        </div>
+    </div>
+</form>
+
+<p class="text-muted">
+    Showing records from
+    <strong>@Model.StartDate.ToString("MMMM dd, yyyy")</strong>
+    to
+    <strong>@Model.EndDate.ToString("MMMM dd, yyyy")</strong>.
+</p>
+
+<hr />
+
 <h3>Overall Summary</h3>
 
 <table class="table table-bordered">
@@ -99,7 +124,6 @@
 
 <hr />
 
-
 <h3>AI-Powered Waste Insights</h3>
 
 <div class="card">
@@ -116,6 +140,8 @@
         <form asp-controller="Reports"
               asp-action="GenerateInsights"
               method="post">
+
+            <input type="hidden" name="period" value="@Model.SelectedPeriod" />
 
             <button type="submit" class="btn btn-primary">
                 Generate AI Insights
@@ -139,5 +165,7 @@
         }
     </div>
 </div>
+
+
 
 

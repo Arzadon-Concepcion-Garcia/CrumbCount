@@ -1,6 +1,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using CrumbCount2.Models;
 using CrumbCount2.Models.ViewModels;
 using CrumbCount2.Services;
@@ -24,18 +25,22 @@ namespace CrumbCount2.Controllers
             _holidayService = holidayService;
         }
 
-        public async Task<IActionResult> Index()
+        // Administrator and Staff can view reports
+        [Authorize(Roles = "Administrator,Staff")]
+        public async Task<IActionResult> Index(string period = "Today")
         {
-            var report = await GetWasteReport();
+            var report = await GetWasteReport(period);
 
             return View(report);
         }
 
+        // Administrator and Staff can generate AI insights
+        [Authorize(Roles = "Administrator,Staff")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> GenerateInsights()
+        public async Task<IActionResult> GenerateInsights(string period = "Today")
         {
-            var report = await GetWasteReport();
+            var report = await GetWasteReport(period);
 
             if (report.TotalWasteRecords == 0)
             {
@@ -93,16 +98,56 @@ namespace CrumbCount2.Controllers
             return View("Index", report);
         }
 
-        private async Task<WasteReportViewModel> GetWasteReport()
+        private async Task<WasteReportViewModel> GetWasteReport(string period)
         {
+            DateTime today = DateTime.Today;
+
+            DateTime startDate;
+            DateTime endDate;
+
+            // Determine the selected date range
+            switch (period?.ToLower())
+            {
+                case "weekly":
+                    int daysSinceMonday =
+                        ((int)today.DayOfWeek + 6) % 7;
+
+                    startDate = today.AddDays(-daysSinceMonday);
+                    endDate = startDate.AddDays(6);
+                    period = "Weekly";
+                    break;
+
+                case "monthly":
+                    startDate = new DateTime(
+                        today.Year, today.Month, 1);
+
+                    endDate = startDate.AddMonths(1).AddDays(-1);
+                    period = "Monthly";
+                    break;
+
+                default:
+                    startDate = today;
+                    endDate = today;
+                    period = "Today";
+                    break;
+            }
+
+            // Retrieve waste records within the selected date range
             var wasteRecords = await _context.WasteRecordings
+                .Where(w =>
+                    w.DateRecorded >= startDate &&
+                    w.DateRecorded < endDate.AddDays(1))
                 .Include(w => w.Product)
                 .ThenInclude(p => p!.Category)
                 .ToListAsync();
 
             var report = new WasteReportViewModel();
 
-            // Store individual waste records, including their dates
+            report.SelectedPeriod = period;
+            report.StartDate = startDate;
+            report.EndDate = endDate;
+
+            // Store individual waste records
             report.WasteRecords = wasteRecords;
 
             report.TotalWasteRecords = wasteRecords.Count;
@@ -113,6 +158,7 @@ namespace CrumbCount2.Controllers
             report.TotalWasteCost = wasteRecords
                 .Sum(w => w.QuantityWasted * (w.Product?.UnitCost ?? 0));
 
+            // Group waste by product
             report.ProductSummaries = wasteRecords
                 .GroupBy(w => w.Product?.ProductName ?? "Unknown Product")
                 .Select(g => new ProductWasteSummary
@@ -124,6 +170,7 @@ namespace CrumbCount2.Controllers
                 })
                 .ToList();
 
+            // Group waste by category
             report.CategorySummaries = wasteRecords
                 .GroupBy(w => w.Product?.Category?.CategoryName ?? "Uncategorized")
                 .Select(g => new CategoryWasteSummary
@@ -134,6 +181,7 @@ namespace CrumbCount2.Controllers
                 })
                 .ToList();
 
+            // Group waste by reason
             report.ReasonSummaries = wasteRecords
                 .GroupBy(w => w.ReasonForWaste)
                 .Select(g => new ReasonWasteSummary
@@ -152,7 +200,13 @@ namespace CrumbCount2.Controllers
         {
             StringBuilder reportData = new StringBuilder();
 
-            reportData.AppendLine("OVERALL SUMMARY:");
+            reportData.AppendLine("WASTE REPORT:");
+            reportData.AppendLine(
+                $"Selected Period: {report.SelectedPeriod}");
+            reportData.AppendLine(
+                $"Date Range: {report.StartDate:yyyy-MM-dd} to {report.EndDate:yyyy-MM-dd}");
+
+            reportData.AppendLine("\nOVERALL SUMMARY:");
             reportData.AppendLine(
                 $"Total Waste Records: {report.TotalWasteRecords}");
             reportData.AppendLine(

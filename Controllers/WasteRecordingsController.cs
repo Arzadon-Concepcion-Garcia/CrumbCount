@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using CrumbCount2.Models;
 
 namespace CrumbCount2.Controllers
@@ -20,6 +21,7 @@ namespace CrumbCount2.Controllers
         }
 
         // GET: WasteRecordings
+        [Authorize(Roles = "Administrator,Staff")]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.WasteRecordings
@@ -29,6 +31,7 @@ namespace CrumbCount2.Controllers
         }
 
         // GET: WasteRecordings/Details/5
+        [Authorize(Roles = "Administrator,Staff")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -49,6 +52,7 @@ namespace CrumbCount2.Controllers
         }
 
         // GET: WasteRecordings/Create
+        [Authorize(Roles = "Administrator,Staff")]
         public IActionResult Create()
         {
             ViewData["ProductId"] = new SelectList(
@@ -61,6 +65,7 @@ namespace CrumbCount2.Controllers
         }
 
         // POST: WasteRecordings/Create
+        [Authorize(Roles = "Administrator,Staff")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
@@ -100,6 +105,7 @@ namespace CrumbCount2.Controllers
         }
 
         // GET: WasteRecordings/Edit/5
+        [Authorize(Roles = "Administrator,Staff")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -126,6 +132,7 @@ namespace CrumbCount2.Controllers
         }
 
         // POST: WasteRecordings/Edit/5
+        [Authorize(Roles = "Administrator,Staff")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
@@ -185,6 +192,7 @@ namespace CrumbCount2.Controllers
         }
 
         // GET: WasteRecordings/Delete/5
+        [Authorize(Roles = "Administrator,Staff")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -205,6 +213,7 @@ namespace CrumbCount2.Controllers
         }
 
         // POST: WasteRecordings/Delete/5
+        [Authorize(Roles = "Administrator,Staff")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
