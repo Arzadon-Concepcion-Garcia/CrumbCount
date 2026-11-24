@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using CrumbCount2.Models;
 using CrumbCount2.Services;
 
@@ -13,6 +14,7 @@ namespace CrumbCount2.Controllers
             _holidayService = holidayService;
         }
 
+        [Authorize(Roles = "Administrator,Staff")]
         public async Task<IActionResult> Index(
             CancellationToken cancellationToken)
         {

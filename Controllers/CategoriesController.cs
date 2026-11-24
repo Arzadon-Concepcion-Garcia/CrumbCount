@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using CrumbCount2.Models;
 
 namespace CrumbCount2.Controllers
@@ -19,12 +20,16 @@ namespace CrumbCount2.Controllers
         }
 
         // GET: Categories
+        // Administrator and Staff can view categories
+        [Authorize(Roles = "Administrator,Staff")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Categories.ToListAsync());
         }
 
         // GET: Categories/Details/5
+        // Administrator and Staff can view category details
+        [Authorize(Roles = "Administrator,Staff")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -34,6 +39,7 @@ namespace CrumbCount2.Controllers
 
             var category = await _context.Categories
                 .FirstOrDefaultAsync(m => m.CategoryId == id);
+
             if (category == null)
             {
                 return NotFound();
@@ -43,14 +49,15 @@ namespace CrumbCount2.Controllers
         }
 
         // GET: Categories/Create
+        // Only Administrator can create categories
+        [Authorize(Roles = "Administrator")]
         public IActionResult Create()
         {
             return View();
         }
 
         // POST: Categories/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("CategoryId,CategoryName,Description")] Category category)
@@ -61,10 +68,13 @@ namespace CrumbCount2.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             return View(category);
         }
 
         // GET: Categories/Edit/5
+        // Only Administrator can edit categories
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -73,16 +83,17 @@ namespace CrumbCount2.Controllers
             }
 
             var category = await _context.Categories.FindAsync(id);
+
             if (category == null)
             {
                 return NotFound();
             }
+
             return View(category);
         }
 
         // POST: Categories/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("CategoryId,CategoryName,Description")] Category category)
@@ -110,12 +121,16 @@ namespace CrumbCount2.Controllers
                         throw;
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(category);
         }
 
         // GET: Categories/Delete/5
+        // Only Administrator can delete categories
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -125,6 +140,7 @@ namespace CrumbCount2.Controllers
 
             var category = await _context.Categories
                 .FirstOrDefaultAsync(m => m.CategoryId == id);
+
             if (category == null)
             {
                 return NotFound();
@@ -134,11 +150,13 @@ namespace CrumbCount2.Controllers
         }
 
         // POST: Categories/Delete/5
+        [Authorize(Roles = "Administrator")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var category = await _context.Categories.FindAsync(id);
+
             if (category != null)
             {
                 _context.Categories.Remove(category);
