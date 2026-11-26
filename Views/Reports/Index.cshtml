@@ -1,0 +1,171 @@
+
+@model CrumbCount2.Models.ViewModels.WasteReportViewModel
+
+@{
+    ViewData["Title"] = "Waste Reports";
+}
+
+<h1>Waste Reports</h1>
+<p>Summary of recorded bakery waste and estimated costs.</p>
+
+<hr />
+
+<h3>Report Date Filter</h3>
+
+<form asp-controller="Reports" asp-action="Index" method="get" class="mb-3">
+    <div class="row align-items-end">
+        <div class="col-md-4">
+            <label for="period" class="form-label">Select Report Period</label>
+            <select id="period" name="period" class="form-select"
+                    onchange="this.form.submit()">
+                <option value="Today" selected="@(Model.SelectedPeriod == "Today")">Today</option>
+                <option value="Weekly" selected="@(Model.SelectedPeriod == "Weekly")">Weekly</option>
+                <option value="Monthly" selected="@(Model.SelectedPeriod == "Monthly")">Monthly</option>
+            </select>
+        </div>
+    </div>
+</form>
+
+<p class="text-muted">
+    Showing records from
+    <strong>@Model.StartDate.ToString("MMMM dd, yyyy")</strong>
+    to
+    <strong>@Model.EndDate.ToString("MMMM dd, yyyy")</strong>.
+</p>
+
+<hr />
+
+<h3>Overall Summary</h3>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Total Waste Records</th>
+        <td>@Model.TotalWasteRecords</td>
+    </tr>
+    <tr>
+        <th>Total Quantity Wasted</th>
+        <td>@Model.TotalQuantityWasted</td>
+    </tr>
+    <tr>
+        <th>Total Estimated Waste Cost</th>
+        <td>₱@Model.TotalWasteCost.ToString("N2")</td>
+    </tr>
+</table>
+
+<hr />
+
+<h3>Waste by Product</h3>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Product Name</th>
+            <th>Quantity Wasted</th>
+            <th>Estimated Waste Cost</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.ProductSummaries)
+        {
+            <tr>
+                <td>@item.ProductName</td>
+                <td>@item.QuantityWasted</td>
+                <td>₱@item.WasteCost.ToString("N2")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<hr />
+
+<h3>Waste by Category</h3>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Category</th>
+            <th>Estimated Waste Cost</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.CategorySummaries)
+        {
+            <tr>
+                <td>@item.CategoryName</td>
+                <td>₱@item.WasteCost.ToString("N2")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<hr />
+
+<h3>Waste by Reason</h3>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Reason</th>
+            <th>Quantity Wasted</th>
+            <th>Estimated Waste Cost</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.ReasonSummaries)
+        {
+            <tr>
+                <td>@item.Reason</td>
+                <td>@item.QuantityWasted</td>
+                <td>₱@item.WasteCost.ToString("N2")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<hr />
+
+<h3>AI-Powered Waste Insights</h3>
+
+<div class="card">
+    <div class="card-header">
+        <strong>Gemini AI Analysis</strong>
+    </div>
+
+    <div class="card-body">
+        <p>
+            AI-generated observations and recommendations
+            based on the recorded bakery waste data.
+        </p>
+
+        <form asp-controller="Reports"
+              asp-action="GenerateInsights"
+              method="post">
+
+            <input type="hidden" name="period" value="@Model.SelectedPeriod" />
+
+            <button type="submit" class="btn btn-primary">
+                Generate AI Insights
+            </button>
+        </form>
+
+        <hr />
+
+        @if (!string.IsNullOrWhiteSpace(Model.AiInsights))
+        {
+            <div style="white-space: pre-line;">
+                @Model.AiInsights
+            </div>
+        }
+        else
+        {
+            <p class="text-muted">
+                Click the button above to generate AI-powered
+                observations and recommendations.
+            </p>
+        }
+    </div>
+</div>
+
+
+
+

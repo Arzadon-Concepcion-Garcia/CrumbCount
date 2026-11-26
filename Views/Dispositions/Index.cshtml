@@ -5,42 +5,105 @@
     ViewData["Title"] = "Disposition Management";
 }
 
-<h1>Disposition Management</h1>
+<h2>Disposition Management</h2>
+
+<p>Manage the disposition of wasted bakery products.</p>
 
 <p>
-    <a asp-action="Create" class="btn btn-primary">Add Disposition</a>
+    <a asp-action="Create" class="btn btn-primary">
+        Add New Disposition
+    </a>
 </p>
 
-<table class="table table-bordered table-striped">
+<div class="mb-3">
+    <input type="text" id="searchInput" class="form-control"
+           placeholder="Search by product, disposition type, or status..." />
+
+    <button type="button" id="clearSearch" class="btn btn-secondary mt-2">
+        Clear Search
+    </button>
+</div>
+
+<table class="table table-bordered table-striped" id="dispositionTable">
     <thead>
         <tr>
-            <th>Waste Recording ID</th>
-            <th>Disposition Type</th>
+            <th>ID</th>
+            <th>Product</th>
             <th>Quantity</th>
-            <th>Disposition Date</th>
+            <th>Disposition Type</th>
+            <th>Date</th>
+            <th>Status</th>
             <th>Remarks</th>
             <th>Actions</th>
         </tr>
     </thead>
+
     <tbody>
         @foreach (var item in Model)
         {
             <tr>
-                <td>@item.WasteRecordingId</td>
-                <td>@item.DispositionType</td>
+                <td>@item.DispositionId</td>
+                <td>@item.WasteRecording?.Product?.ProductName</td>
                 <td>@item.Quantity</td>
-                <td>@item.DispositionDate.ToString("yyyy-MM-dd")</td>
+                <td>@item.DispositionType</td>
+                <td>@item.DispositionDate.ToString("MM/dd/yyyy")</td>
+                <td>@item.Status</td>
                 <td>@item.Remarks</td>
                 <td>
-                    <a asp-action="Edit"
-                       asp-route-id="@item.DispositionId"
+                    <a asp-action="Edit" asp-route-id="@item.DispositionId"
                        class="btn btn-warning btn-sm">Edit</a>
 
-                    <a asp-action="Delete"
-                       asp-route-id="@item.DispositionId"
+                    <a asp-action="Delete" asp-route-id="@item.DispositionId"
                        class="btn btn-danger btn-sm">Delete</a>
+
+                    <a asp-action="Details" asp-route-id="@item.DispositionId"
+                       class="btn btn-info btn-sm">Details</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<p id="noResults" style="display:none;" class="text-danger">
+    No matching dispositions found.
+</p>
+
+@section Scripts {
+    <script>
+        document.getElementById("searchInput").addEventListener("keyup", function () {
+            var searchValue = this.value.toLowerCase();
+            var rows = document.querySelectorAll("#dispositionTable tbody tr");
+            var visibleCount = 0;
+
+            rows.forEach(function (row) {
+                var product = row.cells[1].textContent.toLowerCase();
+                var type = row.cells[3].textContent.toLowerCase();
+                var status = row.cells[5].textContent.toLowerCase();
+
+                if (product.includes(searchValue) ||
+                    type.includes(searchValue) ||
+                    status.includes(searchValue)) {
+                    row.style.display = "";
+                    visibleCount++;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            document.getElementById("noResults").style.display =
+                visibleCount === 0 ? "block" : "none";
+        });
+
+        document.getElementById("clearSearch").addEventListener("click", function () {
+        document.getElementById("searchInput").value = "";
+
+        var rows = document.querySelectorAll("#dispositionTable tbody tr");
+
+        rows.forEach(function (row) {
+            row.style.display = "";
+        });
+
+        document.getElementById("noResults").style.display = "none";
+    });
+    </script>
+}

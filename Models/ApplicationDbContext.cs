@@ -1,17 +1,18 @@
-
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace CrumbCount2.Models;
 
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
     }
 
-    public DbSet<Disposition> Dispositions { get; set; } = default!;
     public DbSet<Category> Categories { get; set; } = default!;
     public DbSet<Product> Products { get; set; } = default!;
     public DbSet<WasteRecording> WasteRecordings { get; set; } = default!;
+    public DbSet<Disposition> Dispositions { get; set; } = default!;
 }
+
