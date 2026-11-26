@@ -1,8 +1,72 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿
+@model IEnumerable<CrumbCount2.Models.WasteRecording>
+
+@{
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="dashboard-header">
+    <h1>Welcome to CrumbCount!</h1>
+    <p>Monitor your bakery's waste and manage your resources.</p>
+</div>
+
+<div class="dashboard-cards">
+    <div class="dashboard-card">
+        <h3>Products</h3>
+        <h2>@ViewBag.ProductCount</h2>
+        <a asp-controller="Products" asp-action="Index">View Products</a>
+    </div>
+
+    <div class="dashboard-card">
+        <h3>Categories</h3>
+        <h2>@ViewBag.CategoryCount</h2>
+        <a asp-controller="Categories" asp-action="Index">View Categories</a>
+    </div>
+
+    <div class="dashboard-card">
+        <h3>Waste Recordings</h3>
+        <h2>@ViewBag.WasteCount</h2>
+        <a asp-controller="WasteRecordings" asp-action="Index">View Records</a>
+    </div>
+
+    <div class="dashboard-card">
+        <h3>Dispositions</h3>
+        <h2>@ViewBag.DispositionCount</h2>
+        <a asp-controller="Dispositions" asp-action="Index">View Dispositions</a>
+    </div>
+</div>
+
+<div class="recent-waste">
+    <h2>Recent Waste Recordings</h2>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity Wasted</th>
+                        <th>Date Recorded</th>
+                        <th>Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@(item.Product?.ProductName ?? "Unknown Product")</td>
+                            <td>@item.QuantityWasted</td>
+                            <td>@item.DateRecorded.ToString("MMM dd, yyyy")</td>
+                            <td>@item.ReasonForWaste</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p>No waste recordings yet.</p>
+    }
 </div>
