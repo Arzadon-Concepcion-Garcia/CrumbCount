@@ -13,8 +13,8 @@ public class Disposition
 
     [Required(ErrorMessage = "Please enter a disposition type.")]
     [StringLength(50, ErrorMessage = "Disposition type cannot exceed 50 characters.")]
-    [RegularExpression("^(Donation|Recycling|Composting|Disposal)$",
-        ErrorMessage = "Select a valid disposition type.")]
+    [RegularExpression("^(Donation|Disposal|Staff Consumption|Approved Reuse)$",
+    ErrorMessage = "Select a valid disposition type.")]
     [Display(Name = "Disposition Type")]
     public string DispositionType { get; set; } = "";
 
