@@ -14,15 +14,18 @@ namespace CrumbCount2.Controllers
         private readonly ApplicationDbContext _context;
         private readonly GeminiService _geminiService;
         private readonly IHolidayService _holidayService;
+        private readonly ILogger<ReportsController> _logger;
 
         public ReportsController(
             ApplicationDbContext context,
             GeminiService geminiService,
-            IHolidayService holidayService)
+            IHolidayService holidayService,
+            ILogger<ReportsController> logger)
         {
             _context = context;
             _geminiService = geminiService;
             _holidayService = holidayService;
+            _logger = logger;
         }
 
         // Administrator and Staff can view reports
@@ -76,8 +79,9 @@ namespace CrumbCount2.Controllers
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("HOLIDAY API ERROR:");
-                    Console.WriteLine(ex.ToString());
+                    _logger.LogError(
+                        ex,
+                        "HOLIDAY API ERROR while retrieving holidays.");
 
                     holidayData =
                         "Holiday information is unavailable. Do not assume holiday dates.";
@@ -88,8 +92,9 @@ namespace CrumbCount2.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("GEMINI ERROR:");
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(
+                    ex,
+                    "GEMINI ERROR while generating waste insights.");
 
                 report.AiInsights =
                     "AI insights are currently unavailable. Please try again later.";
