@@ -96,6 +96,30 @@ namespace CrumbCount2.Controllers
                     ex,
                     "GEMINI ERROR while generating waste insights.");
 
+                // Save Gemini error details to a separate diagnostic file
+                try
+                {
+                    string diagnosticPath =
+                        @"D:\home\data\GeminiDiagnostics.txt";
+
+                    string diagnosticMessage =
+                        $"Date: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n" +
+                        $"Exception Type: {ex.GetType().FullName}\n" +
+                        $"Error Message: {ex.Message}\n" +
+                        $"Inner Exception: {ex.InnerException?.Message ?? "None"}\n" +
+                        "----------------------------------------\n";
+
+                    await System.IO.File.AppendAllTextAsync(
+                        diagnosticPath,
+                        diagnosticMessage);
+                }
+                catch (Exception logEx)
+                {
+                    _logger.LogError(
+                        logEx,
+                        "FAILED TO WRITE GEMINI DIAGNOSTIC FILE.");
+                }
+
                 report.AiInsights =
                     "AI insights are currently unavailable. Please try again later.";
             }
