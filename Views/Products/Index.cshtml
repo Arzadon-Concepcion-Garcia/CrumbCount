@@ -5,73 +5,293 @@
     ViewData["Title"] = "Products";
 }
 
-<h1>Products</h1>
+<style>
+    .products-page {
+        color: #49392F;
+    }
 
-@if (User.IsInRole("Administrator"))
-{
-    <p>
-        <a asp-action="Create" class="btn btn-primary">Create New</a>
-    </p>
-}
+    .product-card {
+        background: #FFFFFF;
+        border: 1px solid #E4D8C8;
+        border-radius: 14px;
+        overflow: hidden;
+        height: 100%;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
 
-<input type="text" id="searchBox" class="form-control mb-3"
-       placeholder="Live search products..." />
+    .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 18px rgba(73, 57, 47, 0.12);
+    }
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Product Name</th>
-            <th>Unit Cost</th>
-            <th>Active</th>
-            <th>Category</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody id="productRows">
+    .product-card-header {
+        background: #A9B78F;
+        padding: 14px 18px;
+        color: #49392F;
+    }
+
+    .product-card-body {
+        padding: 20px;
+    }
+
+    .product-name {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 12px;
+        color: #49392F;
+    }
+
+    .product-price {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #75563F;
+    }
+
+    .product-info {
+        color: #74665B;
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+    }
+
+    .product-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 18px;
+    }
+
+    .btn-create-product {
+        background: #A9B78F;
+        color: #49392F;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-create-product:hover {
+        background: #95A77B;
+        color: #49392F;
+    }
+
+    .btn-product-edit {
+        background: #E5B85C;
+        color: #49392F;
+    }
+
+    .btn-product-details {
+        background: #A9B78F;
+        color: #49392F;
+    }
+
+    .btn-product-delete {
+        background: #C96B63;
+        color: white;
+    }
+
+    .btn-product-edit,
+    .btn-product-details,
+    .btn-product-delete {
+        border: none;
+        border-radius: 6px;
+        padding: 7px 13px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        display: inline-block;
+    }
+
+    .btn-product-edit:hover {
+        background: #D5A747;
+        color: #49392F;
+    }
+
+    .btn-product-details:hover {
+        background: #95A77B;
+        color: #49392F;
+    }
+
+    .btn-product-delete:hover {
+        background: #B95750;
+        color: white;
+    }
+
+    .status-active {
+        background: #E4EDDC;
+        color: #49633D;
+        padding: 5px 11px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .status-inactive {
+        background: #F2E1DF;
+        color: #9B4C45;
+        padding: 5px 11px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .product-search {
+        border: 1px solid #E4D8C8;
+        border-radius: 9px;
+        padding: 12px 16px;
+    }
+
+    .empty-products {
+        background: #FFFFFF;
+        border: 1px dashed #C9BBA9;
+        border-radius: 12px;
+        padding: 35px;
+        text-align: center;
+        color: #74665B;
+    }
+</style>
+
+<div class="products-page">
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h1 class="mb-1">Products</h1>
+            <p class="text-muted mb-0">
+                Manage your bakery products and their details.
+            </p>
+        </div>
+
+        @if (User.IsInRole("Administrator"))
+        {
+            <a asp-action="Create" class="btn-create-product">
+                + Create New Product
+            </a>
+        }
+    </div>
+
+    <div class="mb-4">
+        <input type="text"
+               id="searchBox"
+               class="form-control product-search"
+               placeholder="Search products by name, price, status, or category..." />
+    </div>
+
+    <div class="row g-4" id="productRows">
+
         @foreach (var item in Model)
         {
-            <tr>
-                <td>@item.ProductName</td>
-                <td>@item.UnitCost</td>
-                <td>@item.IsActive</td>
-                <td>@item.Category?.CategoryName</td>
-                <td>
-                    @if (User.IsInRole("Administrator"))
-                    {
-                        <a asp-action="Edit" asp-route-id="@item.ProductId">Edit</a>
-                        <span> | </span>
-                    }
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-3 product-card-item"
+                 data-search="@($"{item.ProductName} {item.UnitCost} {item.IsActive} {item.Category?.CategoryName}")">
 
-                    <a asp-action="Details" asp-route-id="@item.ProductId">Details</a>
+                <div class="product-card">
 
-                    @if (User.IsInRole("Administrator"))
-                    {
-                        <span> | </span>
-                        <a asp-action="Delete" asp-route-id="@item.ProductId">Delete</a>
-                    }
-                </td>
-            </tr>
+                    <div class="product-card-header d-flex justify-content-between align-items-center">
+                        <span class="fw-semibold">Bakery Product</span>
+
+                        @if (item.IsActive)
+                        {
+                            <span class="status-active">Active</span>
+                        }
+                        else
+                        {
+                            <span class="status-inactive">Inactive</span>
+                        }
+                    </div>
+
+                    <div class="product-card-body">
+
+                        <h5 class="product-name">
+                            @item.ProductName
+                        </h5>
+
+                        <div class="product-info">
+                            <span class="fw-semibold">Unit Cost</span>
+                        </div>
+
+                        <div class="product-price mb-3">
+                            ₱@item.UnitCost.ToString("N2")
+                        </div>
+
+                        <hr />
+
+                        <div class="product-info">
+                            <strong>Category:</strong>
+                            @(item.Category?.CategoryName ?? "Uncategorized")
+                        </div>
+
+                        <div class="product-actions">
+
+                            @if (User.IsInRole("Administrator"))
+                            {
+                                <a asp-action="Edit"
+                                   asp-route-id="@item.ProductId"
+                                   class="btn-product-edit">
+                                    Edit
+                                </a>
+                            }
+
+                            <a asp-action="Details"
+                               asp-route-id="@item.ProductId"
+                               class="btn-product-details">
+                                Details
+                            </a>
+
+                            @if (User.IsInRole("Administrator"))
+                            {
+                                <a asp-action="Delete"
+                                   asp-route-id="@item.ProductId"
+                                   class="btn-product-delete">
+                                    Delete
+                                </a>
+                            }
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
         }
-    </tbody>
-</table>
+
+    </div>
+
+    <div id="noProductsFound" class="empty-products mt-3" style="display:none;">
+        <h5>No products found</h5>
+        <p class="mb-0">Try searching with a different keyword.</p>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="empty-products mt-3">
+            <h5>No products available yet</h5>
+            <p class="mb-0">Create your first bakery product to get started.</p>
+        </div>
+    }
+
+</div>
 
 @section Scripts {
     <script>
         document.getElementById("searchBox").addEventListener("input", function () {
 
-            const text = this.value.toLowerCase();
+            const searchText = this.value.toLowerCase().trim();
+            const cards = document.querySelectorAll(".product-card-item");
 
-            document.querySelectorAll("#productRows tr").forEach(function (row) {
+            let visibleCount = 0;
 
-                const rowText = (
-                    row.cells[0].textContent + " " +
-                    row.cells[1].textContent + " " +
-                    row.cells[2].textContent + " " +
-                    row.cells[3].textContent
-                ).toLowerCase();
+            cards.forEach(function (card) {
 
-                row.style.display = rowText.includes(text) ? "" : "none";
+                const cardText = card.dataset.search.toLowerCase();
+
+                const matches = cardText.includes(searchText);
+
+                card.style.display = matches ? "" : "none";
+
+                if (matches) {
+                    visibleCount++;
+                }
             });
+
+            document.getElementById("noProductsFound").style.display =
+                visibleCount === 0 && cards.length > 0 ? "block" : "none";
         });
     </script>
 }
