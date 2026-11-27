@@ -1,3 +1,4 @@
+
 using CrumbCount2.Services;
 using CrumbCount2.Models;
 using Microsoft.EntityFrameworkCore;
@@ -39,6 +40,15 @@ builder.Services
 
 var app = builder.Build();
 
+// Apply pending database migrations BEFORE Identity initialization
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider
+        .GetRequiredService<ApplicationDbContext>();
+
+    await dbContext.Database.MigrateAsync();
+}
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -58,6 +68,7 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+// Initialize Administrator and Staff roles
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -76,7 +87,7 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-    // Get Administrator credentials from User Secrets
+    // Get Administrator credentials from configuration
     var adminEmail = app.Configuration["AdminUser:Email"];
     var adminPassword = app.Configuration["AdminUser:Password"];
     var adminFullName = app.Configuration["AdminUser:FullName"];
@@ -86,7 +97,7 @@ using (var scope = app.Services.CreateScope())
         string.IsNullOrWhiteSpace(adminFullName))
     {
         throw new InvalidOperationException(
-            "Administrator credentials are missing from User Secrets.");
+            "Administrator credentials are missing from configuration.");
     }
 
     // Find or create Administrator account
