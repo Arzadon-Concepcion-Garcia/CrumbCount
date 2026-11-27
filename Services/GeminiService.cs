@@ -1,5 +1,6 @@
 
 using Google.GenAI;
+using Microsoft.Extensions.Configuration;
 
 namespace CrumbCount2.Services
 {
@@ -7,9 +8,17 @@ namespace CrumbCount2.Services
     {
         private readonly Client _client;
 
-        public GeminiService()
+        public GeminiService(IConfiguration configuration)
         {
-            _client = new Client();
+            var apiKey = configuration["GEMINI_API_KEY"];
+
+            if (string.IsNullOrWhiteSpace(apiKey))
+            {
+                throw new InvalidOperationException(
+                    "Gemini API key is missing from configuration.");
+            }
+
+            _client = new Client(apiKey: apiKey);
         }
 
         public async Task<string> GenerateWasteInsights(
@@ -139,3 +148,4 @@ GENERAL RULES:
         }
     }
 }
+
