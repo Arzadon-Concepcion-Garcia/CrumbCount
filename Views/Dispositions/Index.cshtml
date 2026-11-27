@@ -3,107 +3,335 @@
 
 @{
     ViewData["Title"] = "Disposition Management";
+    var dispositions = Model.ToList();
 }
 
-<h2>Disposition Management</h2>
+<style>
+    .disposition-page {
+        color: #49392F;
+    }
 
-<p>Manage the disposition of wasted bakery products.</p>
+    .disposition-card {
+        background: #FFFFFF;
+        border: 1px solid #E4D8C8;
+        border-radius: 14px;
+        overflow: hidden;
+        height: 100%;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">
-        Add New Disposition
-    </a>
-</p>
+    .disposition-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 18px rgba(73, 57, 47, 0.12);
+    }
 
-<div class="mb-3">
-    <input type="text" id="searchInput" class="form-control"
-           placeholder="Search by product, disposition type, or status..." />
+    .disposition-card-header {
+        background: #A9B78F;
+        padding: 14px 18px;
+        color: #49392F;
+        font-weight: 600;
+    }
 
-    <button type="button" id="clearSearch" class="btn btn-secondary mt-2">
-        Clear Search
-    </button>
-</div>
+    .disposition-card-body {
+        padding: 20px;
+    }
 
-<table class="table table-bordered table-striped" id="dispositionTable">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Product</th>
-            <th>Quantity</th>
-            <th>Disposition Type</th>
-            <th>Date</th>
-            <th>Status</th>
-            <th>Remarks</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
+    .disposition-product-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #49392F;
+        margin-bottom: 12px;
+    }
 
-    <tbody>
-        @foreach (var item in Model)
+    .disposition-info {
+        color: #74665B;
+        font-size: 0.93rem;
+        margin-bottom: 10px;
+        overflow-wrap: anywhere;
+    }
+
+    .disposition-label {
+        font-weight: 600;
+        color: #49392F;
+    }
+
+    .disposition-status {
+        display: inline-block;
+        background: #E8EBD9;
+        color: #536447;
+        padding: 5px 11px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .disposition-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 18px;
+    }
+
+    .btn-add-disposition {
+        background: #A9B78F;
+        color: #49392F;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-add-disposition:hover {
+        background: #95A77B;
+        color: #49392F;
+    }
+
+    .btn-disposition-edit {
+        background: #E5B85C;
+        color: #49392F;
+    }
+
+    .btn-disposition-details {
+        background: #A9B78F;
+        color: #49392F;
+    }
+
+    .btn-disposition-delete {
+        background: #C96B63;
+        color: white;
+    }
+
+    .btn-disposition-edit,
+    .btn-disposition-details,
+    .btn-disposition-delete {
+        border: none;
+        border-radius: 6px;
+        padding: 7px 13px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        display: inline-block;
+    }
+
+    .btn-disposition-edit:hover {
+        background: #D5A747;
+        color: #49392F;
+    }
+
+    .btn-disposition-details:hover {
+        background: #95A77B;
+        color: #49392F;
+    }
+
+    .btn-disposition-delete:hover {
+        background: #B95750;
+        color: white;
+    }
+
+    .disposition-search {
+        border: 1px solid #E4D8C8;
+        border-radius: 9px;
+        padding: 12px 16px;
+    }
+
+    .disposition-count {
+        background: #E8EBD9;
+        color: #536447;
+        padding: 5px 11px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .btn-clear-search {
+        background: #E5B85C;
+        color: #49392F;
+        border: none;
+        border-radius: 7px;
+        padding: 8px 15px;
+    }
+
+    .btn-clear-search:hover {
+        background: #D5A747;
+        color: #49392F;
+    }
+
+    .empty-dispositions {
+        background: #FFFFFF;
+        border: 1px dashed #C9BBA9;
+        border-radius: 12px;
+        padding: 35px;
+        text-align: center;
+        color: #74665B;
+    }
+</style>
+
+<div class="disposition-page">
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h1 class="mb-1">Disposition Management</h1>
+            <p class="text-muted mb-0">
+                Manage the disposition of wasted bakery products.
+            </p>
+        </div>
+
+        <a asp-action="Create" class="btn-add-disposition">
+            + Add New Disposition
+        </a>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="disposition-count">
+            @dispositions.Count @(dispositions.Count == 1 ? "Disposition" : "Dispositions")
+        </span>
+    </div>
+
+    <div class="mb-4">
+        <input type="text"
+               id="searchInput"
+               class="form-control disposition-search"
+               placeholder="Search by product, disposition type, or status..."
+               autocomplete="off" />
+
+        <button type="button"
+                id="clearSearch"
+                class="btn-clear-search mt-2">
+            Clear Search
+        </button>
+    </div>
+
+    <div class="row g-4" id="dispositionCards">
+
+        @foreach (var item in dispositions)
         {
-            <tr>
-                <td>@item.DispositionId</td>
-                <td>@item.WasteRecording?.Product?.ProductName</td>
-                <td>@item.Quantity</td>
-                <td>@item.DispositionType</td>
-                <td>@item.DispositionDate.ToString("MM/dd/yyyy")</td>
-                <td>@item.Status</td>
-                <td>@item.Remarks</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.DispositionId"
-                       class="btn btn-warning btn-sm">Edit</a>
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-3 disposition-card-item"
+                 data-search="@($"{item.WasteRecording?.Product?.ProductName} {item.DispositionType} {item.Status}")">
 
-                    <a asp-action="Delete" asp-route-id="@item.DispositionId"
-                       class="btn btn-danger btn-sm">Delete</a>
+                <div class="disposition-card">
 
-                    <a asp-action="Details" asp-route-id="@item.DispositionId"
-                       class="btn btn-info btn-sm">Details</a>
-                </td>
-            </tr>
+                    <div class="disposition-card-header">
+                        Disposition #@item.DispositionId
+                    </div>
+
+                    <div class="disposition-card-body">
+
+                        <h5 class="disposition-product-name">
+                            @(item.WasteRecording?.Product?.ProductName ?? "Unknown Product")
+                        </h5>
+
+                        <div class="disposition-info">
+                            <span class="disposition-label">Quantity:</span>
+                            @item.Quantity
+                        </div>
+
+                        <div class="disposition-info">
+                            <span class="disposition-label">Disposition Type:</span>
+                            @item.DispositionType
+                        </div>
+
+                        <div class="disposition-info">
+                            <span class="disposition-label">Date:</span>
+                            @item.DispositionDate.ToString("MMMM dd, yyyy")
+                        </div>
+
+                        <div class="disposition-info">
+                            <span class="disposition-label">Status:</span>
+                            <span class="disposition-status">@item.Status</span>
+                        </div>
+
+                        <div class="disposition-info">
+                            <span class="disposition-label">Remarks:</span>
+                            @(string.IsNullOrWhiteSpace(item.Remarks)
+                                ? "No remarks"
+                                : item.Remarks)
+                        </div>
+
+                        <hr />
+
+                        <div class="disposition-actions">
+
+                            <a asp-action="Edit"
+                               asp-route-id="@item.DispositionId"
+                               class="btn-disposition-edit">
+                                Edit
+                            </a>
+
+                            <a asp-action="Details"
+                               asp-route-id="@item.DispositionId"
+                               class="btn-disposition-details">
+                                Details
+                            </a>
+
+                            <a asp-action="Delete"
+                               asp-route-id="@item.DispositionId"
+                               class="btn-disposition-delete">
+                                Delete
+                            </a>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
         }
-    </tbody>
-</table>
 
-<p id="noResults" style="display:none;" class="text-danger">
-    No matching dispositions found.
-</p>
+    </div>
+
+    <div id="noResults" class="empty-dispositions mt-3" style="display:none;">
+        <h5>No matching dispositions found</h5>
+        <p class="mb-0">Try searching with a different keyword.</p>
+    </div>
+
+    @if (!dispositions.Any())
+    {
+        <div class="empty-dispositions mt-3">
+            <h5>No dispositions available yet</h5>
+            <p class="mb-0">Add a new disposition to get started.</p>
+        </div>
+    }
+
+</div>
 
 @section Scripts {
     <script>
-        document.getElementById("searchInput").addEventListener("keyup", function () {
-            var searchValue = this.value.toLowerCase();
-            var rows = document.querySelectorAll("#dispositionTable tbody tr");
-            var visibleCount = 0;
+        document.addEventListener("DOMContentLoaded", function () {
 
-            rows.forEach(function (row) {
-                var product = row.cells[1].textContent.toLowerCase();
-                var type = row.cells[3].textContent.toLowerCase();
-                var status = row.cells[5].textContent.toLowerCase();
+            const searchInput = document.getElementById("searchInput");
+            const clearSearch = document.getElementById("clearSearch");
+            const cards = document.querySelectorAll(".disposition-card-item");
+            const noResults = document.getElementById("noResults");
 
-                if (product.includes(searchValue) ||
-                    type.includes(searchValue) ||
-                    status.includes(searchValue)) {
-                    row.style.display = "";
-                    visibleCount++;
-                } else {
-                    row.style.display = "none";
-                }
+            function filterDispositions() {
+
+                const searchValue = searchInput.value.trim().toLowerCase();
+                let visibleCount = 0;
+
+                cards.forEach(function (card) {
+
+                    const cardText = card.dataset.search.toLowerCase();
+                    const matches = cardText.includes(searchValue);
+
+                    card.style.display = matches ? "" : "none";
+
+                    if (matches) {
+                        visibleCount++;
+                    }
+                });
+
+                noResults.style.display =
+                    visibleCount === 0 && cards.length > 0 ? "block" : "none";
+            }
+
+            searchInput.addEventListener("input", filterDispositions);
+
+            clearSearch.addEventListener("click", function () {
+                searchInput.value = "";
+                filterDispositions();
+                searchInput.focus();
             });
 
-            document.getElementById("noResults").style.display =
-                visibleCount === 0 ? "block" : "none";
         });
-
-        document.getElementById("clearSearch").addEventListener("click", function () {
-        document.getElementById("searchInput").value = "";
-
-        var rows = document.querySelectorAll("#dispositionTable tbody tr");
-
-        rows.forEach(function (row) {
-            row.style.display = "";
-        });
-
-        document.getElementById("noResults").style.display = "none";
-    });
     </script>
 }
+
